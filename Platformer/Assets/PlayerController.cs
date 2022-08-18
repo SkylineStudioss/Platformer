@@ -35,7 +35,7 @@ public class PlayerController : MonoBehaviour
     public float groundLength = 0.6f;
     public Vector3 colliderOffset;
     public bool collideWithEnemy;
-
+    private bool justHitEnemy = false;
     [Header("Other")]
     public int enemyCombo;
 
@@ -72,10 +72,10 @@ public class PlayerController : MonoBehaviour
         if (onGround)
         {
             enemyCombo = 0;
-            bounceAmount = 30f;
+            bounceAmount = 15f;
         }
 
-        if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow) && onGround == false)
+        if (Input.GetKey(KeyCode.S) && onGround == false && justHitEnemy == false || Input.GetKey(KeyCode.DownArrow) && onGround == false && justHitEnemy == false)
         {
             GroundPound();
         }
@@ -180,24 +180,11 @@ public class PlayerController : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.collider.CompareTag("Enemy"))
-        {
-            if (isGroundPounding)
-            {
-                bounceAmount = bounceAmount + 3f;
-                rb.AddForce(new Vector2(0, bounceAmount), ForceMode2D.Impulse);
-                //rb.velocity = Vector2.up * bounceAmount;
-                collision.collider.gameObject.SetActive(false);
-                enemyCombo++;
-            }
-        }
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.CompareTag("Enemy"))
+        if (collision.gameObject.tag == "Enemy")
         {
             collideWithEnemy = true;
+            justHitEnemy = true;
+            StartCoroutine(WaitBeforePound());
             if (isGroundPounding)
             {
                 bounceAmount = bounceAmount + 3f;
@@ -205,7 +192,27 @@ public class PlayerController : MonoBehaviour
                 rb.velocity = Vector2.up * bounceAmount;
                 collision.gameObject.SetActive(false);
                 enemyCombo++;
-
+            }
+        }
+        else
+        {
+            collideWithEnemy = false;
+        }
+    }
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Enemy"))
+        {
+            collideWithEnemy = true;
+            justHitEnemy = true;
+            StartCoroutine(WaitBeforePound());
+            if (isGroundPounding)
+            {
+                bounceAmount = bounceAmount + 3f;
+                //rb.AddForce(new Vector2(0, bounceAmount), ForceMode2D.Impulse);
+                rb.velocity = Vector2.up * bounceAmount;
+                collision.gameObject.SetActive(false);
+                enemyCombo++;
             }
         }
         else
@@ -219,13 +226,14 @@ public class PlayerController : MonoBehaviour
         if (collision.CompareTag("Enemy"))
         {
             collideWithEnemy = true;
+            justHitEnemy = true;
+            StartCoroutine(WaitBeforePound());
             if (isGroundPounding)
             {
                 bounceAmount = bounceAmount + 3f;
                 //rb.AddForce(new Vector2(0, bounceAmount), ForceMode2D.Impulse);
                 rb.velocity = Vector2.up * bounceAmount;
                 collision.gameObject.SetActive(false);
-
             }
         }
         else
@@ -234,4 +242,9 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    IEnumerator WaitBeforePound()
+    {
+        yield return new WaitForSeconds(0.25f);
+        justHitEnemy = false;
+    }
 }
