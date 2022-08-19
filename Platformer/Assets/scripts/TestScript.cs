@@ -16,5 +16,6 @@ public class TestScript : MonoBehaviour
     {
         Number++;
         Debug.Log("Your Number is " + Number);
+        //what are you doing?
     }
 }
