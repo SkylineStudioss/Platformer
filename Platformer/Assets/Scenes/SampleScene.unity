@@ -468,7 +468,7 @@ MonoBehaviour:
   jumpSpeed: 15
   jumpDelay: 0.25
   isGroundPounding: 0
-  bounceAmount: 15
+  bounceAmount: 30
   rb: {fileID: 209386406}
   groundLayer:
     serializedVersion: 2
@@ -477,7 +477,7 @@ MonoBehaviour:
   maxSpeed: 7
   linearDrag: 4
   gravity: 1
-  fallMultiplier: 5
+  fallMultiplier: 3
   groundPoundFallSpeed: 4
   maxBounce: 40
   onGround: 0
@@ -488,6 +488,12 @@ MonoBehaviour:
   enemyCombo: 0
   hitCollider: {fileID: 1261150354}
   bottomHitCollider: {fileID: 1396556668}
+  frontCheck: {fileID: 897965128}
+  wallSlidingSpeed: 2
+  checkRadius: 0.6
+  xWallForce: 7.5
+  yWallForce: 15
+  wallJumpTime: 0.05
 --- !u!212 &209386408
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -554,6 +560,7 @@ Transform:
   m_Children:
   - {fileID: 1261150357}
   - {fileID: 1396556669}
+  - {fileID: 897965128}
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1040,6 +1047,37 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &897965127
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 897965128}
+  m_Layer: 0
+  m_Name: FrontCheck
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &897965128
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 897965127}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.69, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 209386409}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &908383021
 GameObject:
   m_ObjectHideFlags: 0
@@ -1448,7 +1486,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77e9e1fa8757b964d897c3999d79238c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isBottom: 1
+  isBottom: 0
   pc: {fileID: 209386407}
 --- !u!61 &1261150356
 BoxCollider2D:

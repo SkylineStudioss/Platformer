@@ -42,6 +42,16 @@ public class PlayerController : MonoBehaviour
     private bool canAttack;
     public GameObject hitCollider;
     public GameObject bottomHitCollider;
+    private float defaultBounce;
+    bool isTouchingFront;
+    public Transform frontCheck;
+    bool wallSliding;
+    public float wallSlidingSpeed;
+    public float checkRadius;
+    bool walljumping;
+    public float xWallForce;
+    public float yWallForce;
+    public float wallJumpTime;
 
     IEnumerator WaitAttack()
     {
@@ -50,6 +60,11 @@ public class PlayerController : MonoBehaviour
         bottomHitCollider.SetActive(false);
         hitCollider.SetActive(false);
         
+    }
+
+    private void Start()
+    {
+        defaultBounce = bounceAmount;
     }
 
     void Update()
@@ -79,6 +94,31 @@ public class PlayerController : MonoBehaviour
         {
             jumpTimer = Time.time + jumpDelay;
         }
+        isTouchingFront = Physics2D.OverlapCircle(frontCheck.position, checkRadius, groundLayer);
+
+        if (isTouchingFront == true && onGround == false && direction.x != 0)
+        {
+            wallSliding = true;
+        } else
+        {
+            wallSliding = false;
+        }
+
+        if (wallSliding)
+        {
+            rb.velocity = new Vector2(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -wallSlidingSpeed, float.MaxValue));
+        }
+
+        if (Input.GetButtonDown("Jump") && wallSliding == true)
+        {
+            walljumping = true;
+            Invoke("SetWallJumpingFalse", wallJumpTime);
+        }
+
+        if (walljumping == true)
+        {
+            rb.velocity = new Vector2(xWallForce * -direction.x, yWallForce);
+        }
         //animator.SetBool("onGround", onGround);
         direction = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
     }
@@ -93,7 +133,7 @@ public class PlayerController : MonoBehaviour
         if (onGround)
         {
             enemyCombo = 0;
-            bounceAmount = 15f;
+            bounceAmount = defaultBounce;
         }
 
         if (Input.GetKey(KeyCode.S) && onGround == false && justHitEnemy == false || Input.GetKey(KeyCode.DownArrow) && onGround == false && justHitEnemy == false)
@@ -203,5 +243,10 @@ public class PlayerController : MonoBehaviour
     {
         yield return new WaitForSeconds(0.25f);
         justHitEnemy = false;
+    }
+
+    void SetWallJumpingFalse()
+    {
+        walljumping = false;
     }
 }
