@@ -267,7 +267,7 @@ GameObject:
   - component: {fileID: 87150034}
   - component: {fileID: 87150033}
   - component: {fileID: 87150032}
-  m_Layer: 3
+  m_Layer: 6
   m_Name: Square (6)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -465,10 +465,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 10
   direction: {x: 0, y: 0}
-  jumpSpeed: 15
+  jumpSpeed: 7
   jumpDelay: 0.25
   isGroundPounding: 0
-  bounceAmount: 30
+  bounceAmount: 18
   rb: {fileID: 209386406}
   groundLayer:
     serializedVersion: 2
@@ -477,9 +477,9 @@ MonoBehaviour:
   maxSpeed: 7
   linearDrag: 4
   gravity: 1
-  fallMultiplier: 3
+  fallMultiplier: 4
   groundPoundFallSpeed: 4
-  maxBounce: 40
+  maxBounce: 25
   onGround: 0
   groundLength: 0.6
   colliderOffset: {x: 0, y: 0, z: 0}
@@ -492,8 +492,12 @@ MonoBehaviour:
   wallSlidingSpeed: 2
   checkRadius: 0.6
   xWallForce: 7.5
-  yWallForce: 15
+  yWallForce: 7.5
   wallJumpTime: 0.05
+  momentum: 60
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!212 &209386408
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -554,7 +558,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 209386403}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -14.05, y: -1.25, z: 0}
+  m_LocalPosition: {x: -7.05, y: 0.51, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1089,7 +1093,7 @@ GameObject:
   - component: {fileID: 908383024}
   - component: {fileID: 908383023}
   - component: {fileID: 908383022}
-  m_Layer: 3
+  m_Layer: 6
   m_Name: Square (5)
   m_TagString: Untagged
   m_Icon: {fileID: 0}

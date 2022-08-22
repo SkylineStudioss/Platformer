@@ -26,6 +26,19 @@ public class HitCollider : MonoBehaviour
         {
             pc.collideWithEnemy = false;
         }
+        if (collision.CompareTag("Enemy") && isBottom == true && pc.isGroundPounding)
+        {
+            pc.collideWithEnemy = true;
+            pc.justHitEnemy = true;
+            pc.bounceAmount = pc.bounceAmount + 3f;
+            pc.rb.velocity += new Vector2(0, pc.bounceAmount);
+            collision.gameObject.SetActive(false);
+            pc.enemyCombo++;
+        }
+        else
+        {
+            pc.collideWithEnemy = false;
+        }
     }
 
     private void OnTriggerStay2D(Collider2D collision)
@@ -39,9 +52,23 @@ public class HitCollider : MonoBehaviour
             pc.collideWithEnemy = true;
             pc.justHitEnemy = true;
             pc.bounceAmount = pc.bounceAmount + 3f;
-            Vector2 velocity = pc.rb.velocity;
+            Vector2 velocity = new Vector2(pc.momentum, pc.rb.velocity.y);
             Vector2 Reflect = Vector2.Reflect(velocity, pc.transform.up).normalized;
             pc.rb.AddForce(Reflect * pc.bounceAmount, ForceMode2D.Impulse);
+            collision.gameObject.SetActive(false);
+            pc.enemyCombo++;
+        }
+        else
+        {
+            pc.collideWithEnemy = false;
+        }
+
+        if (collision.CompareTag("Enemy") && isBottom == true && pc.isGroundPounding)
+        {
+            pc.collideWithEnemy = true;
+            pc.justHitEnemy = true;
+            pc.bounceAmount = pc.bounceAmount + 3f;
+            pc.rb.velocity += new Vector2(0, pc.bounceAmount);
             collision.gameObject.SetActive(false);
             pc.enemyCombo++;
         }

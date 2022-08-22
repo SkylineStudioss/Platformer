@@ -52,6 +52,8 @@ public class PlayerController : MonoBehaviour
     public float xWallForce;
     public float yWallForce;
     public float wallJumpTime;
+    public float momentum;
+    public LayerMask wallLayer;
 
     IEnumerator WaitAttack()
     {
@@ -59,7 +61,6 @@ public class PlayerController : MonoBehaviour
         canAttack = false;
         bottomHitCollider.SetActive(false);
         hitCollider.SetActive(false);
-        
     }
 
     private void Start()
@@ -67,10 +68,20 @@ public class PlayerController : MonoBehaviour
         defaultBounce = bounceAmount;
     }
 
+    void Crouch()
+    {
+
+    }
+
     void Update()
     {
         bool wasOnGround = onGround;
         onGround = Physics2D.Raycast(transform.position + colliderOffset, Vector2.down, groundLength, groundLayer) || Physics2D.Raycast(transform.position - colliderOffset, Vector2.down, groundLength, groundLayer);
+
+        if (Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            Crouch();
+        }
 
         if (!wasOnGround && onGround)
         {
@@ -94,7 +105,7 @@ public class PlayerController : MonoBehaviour
         {
             jumpTimer = Time.time + jumpDelay;
         }
-        isTouchingFront = Physics2D.OverlapCircle(frontCheck.position, checkRadius, groundLayer);
+        isTouchingFront = Physics2D.OverlapCircle(frontCheck.position, checkRadius, wallLayer);
 
         if (isTouchingFront == true && onGround == false && direction.x != 0)
         {
@@ -142,7 +153,7 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            gravity = 1f;
+            gravity = 0.5f;
             isGroundPounding = false;
         }
 
