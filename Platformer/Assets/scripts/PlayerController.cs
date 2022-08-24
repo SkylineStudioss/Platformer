@@ -54,6 +54,11 @@ public class PlayerController : MonoBehaviour
     public float wallJumpTime;
     public float momentum;
     public LayerMask wallLayer;
+    public BoxCollider2D slideColl;
+    public BoxCollider2D normColl;
+    private bool isSliding = false;
+    public float slideSpeed = 10f;
+    private bool isCrouching = true;
 
     IEnumerator WaitAttack()
     {
@@ -68,9 +73,42 @@ public class PlayerController : MonoBehaviour
         defaultBounce = bounceAmount;
     }
 
+    void Slide()
+    {
+        isSliding = true;
+        normColl.enabled = false;
+        slideColl.enabled = true;
+
+        if (facingRight && direction.x != 0)
+        {
+            rb.AddForce(Vector2.right * slideSpeed);
+        } else
+        {
+            rb.AddForce(Vector2.left * slideSpeed);
+        }
+        if (direction.x == 0)
+        {
+            Crouch();
+        } else
+        {
+            isCrouching = false;
+        }
+
+        StartCoroutine(StopSlide());
+    }
+
     void Crouch()
     {
+        isCrouching = true;
+    }
 
+    IEnumerator StopSlide()
+    {
+        yield return new WaitForSeconds(0.8f);
+        //play slide anim
+        normColl.enabled = true;
+        slideColl.enabled = false;
+        isSliding = false;
     }
 
     void Update()
@@ -80,7 +118,7 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
-            Crouch();
+            Slide();
         }
 
         if (!wasOnGround && onGround)
@@ -130,6 +168,16 @@ public class PlayerController : MonoBehaviour
         {
             rb.velocity = new Vector2(xWallForce * -direction.x, yWallForce);
         }
+
+        if (Input.GetKeyDown(KeyCode.S) && onGround == false || Input.GetKeyDown(KeyCode.DownArrow) && onGround == false && justHitEnemy == false)
+        {
+            GroundPound();
+        } else if (onGround)
+        {
+            gravity = 1f;
+            isGroundPounding = false;
+        }
+
         //animator.SetBool("onGround", onGround);
         direction = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
     }
@@ -141,22 +189,13 @@ public class PlayerController : MonoBehaviour
             Jump();
         }
 
-        if (onGround)
+        if (onGround && justHitEnemy == false)
         {
             enemyCombo = 0;
             bounceAmount = defaultBounce;
         }
 
-        if (Input.GetKey(KeyCode.S) && onGround == false && justHitEnemy == false || Input.GetKey(KeyCode.DownArrow) && onGround == false && justHitEnemy == false)
-        {
-            GroundPound();
-        }
-        else
-        {
-            gravity = 0.5f;
-            isGroundPounding = false;
-        }
-
+        
         modifyPhysics();
     }
 
