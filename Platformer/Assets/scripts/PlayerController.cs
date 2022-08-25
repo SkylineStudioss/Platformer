@@ -56,9 +56,14 @@ public class PlayerController : MonoBehaviour
     public LayerMask wallLayer;
     public BoxCollider2D slideColl;
     public BoxCollider2D normColl;
-    private bool isSliding = false;
+    [HideInInspector]
+    public bool isSliding = false;
     public float slideSpeed = 10f;
     private bool isCrouching = true;
+    private float defaultSpeed;
+    private bool isOnPlatform;
+    public LayerMask platformLayer;
+    public Transform bottomCheck;
 
     IEnumerator WaitAttack()
     {
@@ -71,6 +76,7 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         defaultBounce = bounceAmount;
+        defaultSpeed = moveSpeed;
     }
 
     void Slide()
@@ -82,9 +88,11 @@ public class PlayerController : MonoBehaviour
         if (facingRight && direction.x != 0)
         {
             rb.AddForce(Vector2.right * slideSpeed);
+            moveSpeed = .5f;
         } else
         {
             rb.AddForce(Vector2.left * slideSpeed);
+            moveSpeed = .5f;
         }
         if (direction.x == 0)
         {
@@ -104,19 +112,22 @@ public class PlayerController : MonoBehaviour
 
     IEnumerator StopSlide()
     {
-        yield return new WaitForSeconds(0.8f);
+        yield return new WaitForSeconds(1f);
         //play slide anim
         normColl.enabled = true;
         slideColl.enabled = false;
         isSliding = false;
+        moveSpeed = defaultSpeed;
     }
 
     void Update()
     {
         bool wasOnGround = onGround;
-        onGround = Physics2D.Raycast(transform.position + colliderOffset, Vector2.down, groundLength, groundLayer) || Physics2D.Raycast(transform.position - colliderOffset, Vector2.down, groundLength, groundLayer);
 
-        if (Input.GetKeyDown(KeyCode.LeftShift))
+        onGround = Physics2D.Raycast(transform.position + colliderOffset, Vector2.down, groundLength, groundLayer) || Physics2D.Raycast(transform.position - colliderOffset, Vector2.down, groundLength, groundLayer);
+        isTouchingFront = Physics2D.OverlapCircle(frontCheck.position, checkRadius, wallLayer);
+
+        if (Input.GetKeyDown(KeyCode.LeftShift) && isSliding == false)
         {
             Slide();
         }
@@ -143,7 +154,6 @@ public class PlayerController : MonoBehaviour
         {
             jumpTimer = Time.time + jumpDelay;
         }
-        isTouchingFront = Physics2D.OverlapCircle(frontCheck.position, checkRadius, wallLayer);
 
         if (isTouchingFront == true && onGround == false && direction.x != 0)
         {
@@ -169,10 +179,10 @@ public class PlayerController : MonoBehaviour
             rb.velocity = new Vector2(xWallForce * -direction.x, yWallForce);
         }
 
-        if (Input.GetKeyDown(KeyCode.S) && onGround == false || Input.GetKeyDown(KeyCode.DownArrow) && onGround == false && justHitEnemy == false)
+        if (Input.GetKeyDown(KeyCode.S) && onGround == false && justHitEnemy == false || Input.GetKeyDown(KeyCode.DownArrow) && onGround == false && justHitEnemy == false)
         {
             GroundPound();
-        } else if (onGround)
+        } else if (onGround || justHitEnemy == true)
         {
             gravity = 1f;
             isGroundPounding = false;
@@ -291,7 +301,7 @@ public class PlayerController : MonoBehaviour
 
     public IEnumerator WaitBeforePound()
     {
-        yield return new WaitForSeconds(0.25f);
+        yield return new WaitForSeconds(1f);
         justHitEnemy = false;
     }
 
