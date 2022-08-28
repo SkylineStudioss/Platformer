@@ -54,6 +54,16 @@ public class PlayerController : MonoBehaviour
     public float wallJumpTime;
     public float momentum;
     public LayerMask wallLayer;
+    public BoxCollider2D slideColl;
+    public BoxCollider2D normColl;
+    [HideInInspector]
+    public bool isSliding = false;
+    public float slideSpeed = 10f;
+    private bool isCrouching = true;
+    private float defaultSpeed;
+    private bool isOnPlatform;
+    public LayerMask platformLayer;
+    public Transform bottomCheck;
 
     IEnumerator WaitAttack()
     {
@@ -66,21 +76,60 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         defaultBounce = bounceAmount;
+        defaultSpeed = moveSpeed;
+    }
+
+    void Slide()
+    {
+        isSliding = true;
+        normColl.enabled = false;
+        slideColl.enabled = true;
+
+        if (facingRight && direction.x != 0)
+        {
+            rb.AddForce(Vector2.right * slideSpeed);
+            moveSpeed = .5f;
+        } else
+        {
+            rb.AddForce(Vector2.left * slideSpeed);
+            moveSpeed = .5f;
+        }
+        if (direction.x == 0)
+        {
+            Crouch();
+        } else
+        {
+            isCrouching = false;
+        }
+
+        StartCoroutine(StopSlide());
     }
 
     void Crouch()
     {
+        isCrouching = true;
+    }
 
+    IEnumerator StopSlide()
+    {
+        yield return new WaitForSeconds(1f);
+        //play slide anim
+        normColl.enabled = true;
+        slideColl.enabled = false;
+        isSliding = false;
+        moveSpeed = defaultSpeed;
     }
 
     void Update()
     {
         bool wasOnGround = onGround;
-        onGround = Physics2D.Raycast(transform.position + colliderOffset, Vector2.down, groundLength, groundLayer) || Physics2D.Raycast(transform.position - colliderOffset, Vector2.down, groundLength, groundLayer);
 
-        if (Input.GetKeyDown(KeyCode.LeftShift))
+        onGround = Physics2D.Raycast(transform.position + colliderOffset, Vector2.down, groundLength, groundLayer) || Physics2D.Raycast(transform.position - colliderOffset, Vector2.down, groundLength, groundLayer);
+        isTouchingFront = Physics2D.OverlapCircle(frontCheck.position, checkRadius, wallLayer);
+
+        if (Input.GetKeyDown(KeyCode.LeftShift) && isSliding == false)
         {
-            Crouch();
+            Slide();
         }
 
         if (!wasOnGround && onGround)
@@ -105,7 +154,6 @@ public class PlayerController : MonoBehaviour
         {
             jumpTimer = Time.time + jumpDelay;
         }
-        isTouchingFront = Physics2D.OverlapCircle(frontCheck.position, checkRadius, wallLayer);
 
         if (isTouchingFront == true && onGround == false && direction.x != 0)
         {
@@ -130,6 +178,16 @@ public class PlayerController : MonoBehaviour
         {
             rb.velocity = new Vector2(xWallForce * -direction.x, yWallForce);
         }
+
+        if (Input.GetKeyDown(KeyCode.S) && onGround == false && justHitEnemy == false || Input.GetKeyDown(KeyCode.DownArrow) && onGround == false && justHitEnemy == false)
+        {
+            GroundPound();
+        } else if (onGround || justHitEnemy == true)
+        {
+            gravity = 1f;
+            isGroundPounding = false;
+        }
+
         //animator.SetBool("onGround", onGround);
         direction = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
     }
@@ -141,22 +199,13 @@ public class PlayerController : MonoBehaviour
             Jump();
         }
 
-        if (onGround)
+        if (onGround && justHitEnemy == false)
         {
             enemyCombo = 0;
             bounceAmount = defaultBounce;
         }
 
-        if (Input.GetKey(KeyCode.S) && onGround == false && justHitEnemy == false || Input.GetKey(KeyCode.DownArrow) && onGround == false && justHitEnemy == false)
-        {
-            GroundPound();
-        }
-        else
-        {
-            gravity = 0.5f;
-            isGroundPounding = false;
-        }
-
+        
         modifyPhysics();
     }
 
@@ -252,7 +301,7 @@ public class PlayerController : MonoBehaviour
 
     public IEnumerator WaitBeforePound()
     {
-        yield return new WaitForSeconds(0.25f);
+        yield return new WaitForSeconds(1f);
         justHitEnemy = false;
     }
 
