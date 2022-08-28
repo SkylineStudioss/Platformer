@@ -54,6 +54,8 @@ public class PlayerController : MonoBehaviour
     public float wallJumpTime;
     public float momentum;
     public LayerMask wallLayer;
+    public _SceneManager sceneManager;
+    public string _loadLevel;
 
     IEnumerator WaitAttack()
     {
@@ -75,6 +77,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        MoveCharacter(direction.x);
         bool wasOnGround = onGround;
         onGround = Physics2D.Raycast(transform.position + colliderOffset, Vector2.down, groundLength, groundLayer) || Physics2D.Raycast(transform.position - colliderOffset, Vector2.down, groundLength, groundLayer);
 
@@ -135,7 +138,6 @@ public class PlayerController : MonoBehaviour
     }
     void FixedUpdate()
     {
-        MoveCharacter(direction.x);
         if (jumpTimer > Time.time && onGround)
         {
             Jump();
@@ -259,5 +261,14 @@ public class PlayerController : MonoBehaviour
     void SetWallJumpingFalse()
     {
         walljumping = false;
+    }
+
+    void OnTriggerStay2D(Collider2D col)
+    {
+        if(col.gameObject.tag == "door")
+        {
+            _loadLevel = col.gameObject.GetComponent<_SceneManager>()._sceneToLoad;
+            sceneManager = col.gameObject.GetComponent<_SceneManager>();
+        }
     }
 }

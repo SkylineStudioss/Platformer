@@ -1,0 +1,11 @@
+	The level loading script is complete, and should be robust enough to carry the project without being changes in any way.
+Should this not be true, I did not comment the code at all. So good luck editing the code that I forgot what it did WHILE I
+was writing it. 
+	As of the writing of this, all that need to be done to transition scenes as the player, in a new scene, is that the 
+LevelLoader needs do be given a reference to the player and the animator of the SceneTransition object(which is also in the 
+SceneTransition folder, and the Doors need to be given the name of the scene to transition to.
+	Every thing else is already handled dynamically, so while the game is runnging. I did it like this so that it would be 
+easy for me to add new levels, turn out I did it so you didn't have to read my god awful code.
+Please make this project a real game, I wanted to see it to completion, but that just isn't possible right now.
+												-Calzone407
+	
