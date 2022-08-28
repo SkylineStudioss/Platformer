@@ -3,29 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class _SceneManager : MonoBehaviour
+public class _SceneMAnager : MonoBehaviour
 {
     public string _sceneToLoad;
-    private bool _isInputing;
-    public _levelLoader s_level;
-   // [HideInInspector]
-    public PlayerController player;
-    
-    void Start()
-    {
-        s_level = FindObjectOfType<_levelLoader>();
-    }
-
+    bool _isInputing;
     void Update()
     {
-        if(Input.GetKey(KeyCode.Q))
+        if(Input.GetKey(KeyCode.W))
         {
-            s_level._isTrans = true;
             _isInputing = true;
         }
         else
         {
-             s_level._isTrans = false;
             _isInputing = false;
         }
     }
@@ -33,10 +22,7 @@ public class _SceneManager : MonoBehaviour
     {
         if(col.gameObject.tag == "Player" && _isInputing)
         {
-            s_level.f_transition();
+                SceneManager.LoadScene(_sceneToLoad);
         }
-        player = col.gameObject.GetComponent<PlayerController>();
     }
-
-    
 }
